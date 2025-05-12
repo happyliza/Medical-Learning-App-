@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning App  Store - User Panel</title>
+    <!-- The external CSS link is commented out or removed -->
+    <!-- <link rel="stylesheet" href="style.css"> -->
+
+<!-- Embedded CSS for professional UI -->
+<style>
+    /* Basic Reset and Body Styles */
+    body {
+        margin: 0;
+        font-family: 'Arial', sans-serif; /* Changed font for a cleaner look */
+        line-height: 1.6;
+        background-color: #1a1a2e; /* Dark background inspired by gaming */
+        color: #e0e0e0; /* Light text color */
+        padding: 20px; /* Add some padding around the content */
+        display: flex;
+        flex-direction: column; /* Stack body content vertically */
+        align-items: center; /* Center content horizontally */
+        min-height: 100vh; /* Ensure body takes at least full viewport height */
+        box-sizing: border-box; /* Include padding in element's total width and height */
+    }
+
+    /* General Section Styling */
+     #auth-section, #home-section, #game-section {
+        background-color: #2a2a4a; /* Slightly lighter dark background for sections */
+        padding: 40px;
+        border-radius: 10px; /* Rounded corners */
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5); /* Subtle shadow */
+        width: 100%; /* Ensure it takes full width on small screens */
+        text-align: center; /* Center text within sections */
+        margin-bottom: 20px; /* Space between sections if they appear one after another */
+        box-sizing: border-box; /* Include padding in element's total width and height */
+    }
+
+    /* Specific width control for Auth and Home sections */
+    #auth-section, #home-section {
+         max-width: 600px; /* Limit width for readability on larger screens */
+    }
+
+    /* Game section will naturally expand up to its content's max-width */
+    #game-section {
+         max-width: 1000px; /* Allow game section to be a bit wider to accommodate the game-container */
+         padding-bottom: 20px; /* Add some padding at the bottom */
+    }
+
+
+    h2, h3 {
+        color: #e94560; /* Accent color for headings */
+        margin-bottom: 20px;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Forms Styles */
+    #signin-form, #signup-form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px; /* Space between form elements */
+        margin-top: 20px;
+    }
+
+    input[type="email"],
+    input[type="password"],
+    input[type="text"] {
+        padding: 12px 15px;
+        border: 1px solid #444; /* Darker border */
+        border-radius: 5px;
+        background-color: #333; /* Even darker background for inputs */
+        color: #e0e0e0; /* Light text color */
+        font-size: 1em;
+        transition: border-color 0.3s ease; /* Smooth transition on focus */
+    }
+
+    input[type="email"]:focus,
+    input[type="password"]:focus,
+    input[type="text"]:focus {
+        border-color: #e94560; /* Accent color on focus */
+        outline: none; /* Remove default outline */
+        box-shadow: 0 0 5px rgba(233, 69, 96, 0.5); /* Subtle glow on focus */
+    }
+
+    button {
+        padding: 12px 25px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+        font-weight: bold;
+        transition: background-color 0.3s ease, transform 0.1s ease; /* Smooth transitions */
+        margin-top: 10px; /* Space above buttons */
+    }
+
+    #signin-button, #signup-button {
+        background-color: #e94560; /* Primary button color */
+        color: white;
+    }
+
+    #signin-button:hover, #signup-button:hover {
+        background-color: #c2374f; /* Darker shade on hover */
+        transform: translateY(-2px); /* Slight lift effect */
+    }
+
+    .secondary-button {
+        background: none; /* Make secondary buttons look like links */
+        color: #e94560; /* Use accent color */
+        padding: 0;
+        margin: 0 5px;
+        text-decoration: underline; /* Indicate it's clickable */
+    }
+
+    .secondary-button:hover {
+        color: #c2374f;
+        text-decoration: none;
+        transform: none; /* No lift effect */
+    }
+
+
+    p {
+        margin-top: 15px;
+        font-size: 0.9em;
+        color: #b0b0b0; /* Lighter grey for general text */
+    }
+
+    #signin-error, #signup-error {
+        color: #ff6b6b; /* Error color */
+        font-weight: bold;
+        margin-top: 10px;
+        min-height: 1.2em; /* Reserve space even when empty */
+    }
+
+    /* Home Section - Game List */
+    #home-section {
+         display: flex; /* Use flexbox for home section */
+         flex-direction: column; /* Stack items vertically */
+         align-items: center; /* Center items horizontally */
+    }
+
+     #home-section h2 {
+        margin-bottom: 30px; /* Add space below heading */
+    }
+
+    /* --- NEW: Search Bar Styling --- */
+    #search-container {
+        margin-bottom: 20px; /* Space below the search bar */
+        display: flex; /* Align input and button */
+        gap: 10px; /* Space between input and button */
+        width: 100%;
+        max-width: 400px; /* Limit search bar width */
+        justify-content: center; /* Center search bar contents */
+        align-items: center; /* Vertically align contents */
+        align-self: center; /* Center the search container within the flex parent (#home-section) */
+    }
+
+    #search-input {
+         flex-grow: 1; /* Allow input to take available space */
+         /* Inherits basic styles from input[type="text"] */
+    }
+
+     #search-button {
+         /* Inherits button styles */
+         padding: 12px 20px; /* Adjust padding slightly if needed */
+         /* Override potential general button top margin */
+         margin-top: 0;
+     }
+    /* --- END NEW: Search Bar Styling --- */
+
+
+    #game-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Responsive grid */
+        gap: 20px; /* Space between grid items */
+        margin-top: 0; /* Remove top margin as it's handled by h2 margin-bottom */
+        width: 100%; /* Ensure grid takes full width of container */
+        text-align: left; /* Align game item text left */
+    }
+
+    .game-item {
+        background-color: #3a3a5a; /* Card background */
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* Center image and title */
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        text-align: center; /* Center text within the item */
+    }
+
+    .game-item:hover {
+        transform: translateY(-5px); /* Lift effect on hover */
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+    }
+
+    .game-item img {
+        max-width: 100%; /* Ensure image fits container */
+        height: auto; /* Maintain aspect ratio */
+         /* Set a fixed height for images to prevent layout shifts */
+        height: 100px; /* Adjust as needed for your images */
+        object-fit: cover; /* Cover the area without distortion */
+        border-radius: 5px; /* Slightly rounded image corners */
+        margin-bottom: 10px;
+    }
+
+    .game-item h3 {
+        font-size: 1.1em;
+        margin: 5px 0 15px 0;
+        color: #fff; /* White for game titles */
+        text-align: center;
+        overflow: hidden; /* Prevent long titles from breaking layout */
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        width: 100%; /* Ensure ellipsis works */
+    }
+
+    .game-item .play-button {
+        background-color: #66fcf1; /* Different accent color for play button */
+        color: #1a1a2e; /* Dark text on light button */
+        margin-top: auto; /* Push button to the bottom */
+        width: 100%; /* Make button full width */
+        font-size: 0.9em;
+    }
+
+    .game-item .play-button:hover {
+         background-color: #45a29e; /* Darker shade on hover */
+         transform: translateY(-2px);
+    }
+
+    #signout-button {
+        background-color: #ff6b6b; /* Red color for sign out */
+        color: white;
+        margin-top: 30px; /* Space above sign out button */
+    }
+
+    #signout-button:hover {
+        background-color: #e55a5a;
+        transform: translateY(-2px);
+    }
+
+
+    /* Game Section - Mobile Friendly Area */
+    #game-section {
+         display: flex;
+         flex-direction: column;
+         align-items: center;
+    }
+
+    #game-section h2#game-title {
+        color: #66fcf1;
+        margin-bottom: 25px;
+    }
+
+    /* The container that holds the responsive iframe */
+    #game-container {
+        margin-top: 20px;
+        position: relative;
+        padding-bottom: 180.25%; /* 16:9 Aspect Ratio (adjust if your games need a different ratio) */
+        height: 0; /* Important to make padding-bottom control height */
+        overflow: hidden;
+        max-width: 900px; /* Max width of the game display area */
+        width: 100%; /* Take full width on smaller screens/containers */
+        background-color: #0f0f1a; /* Dark background behind the iframe */
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.9);
+        margin-bottom: 20px;
+    }
+
+    /* The iframe itself, filling the responsive container */
+    #game-iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+
+    #back-to-home {
+        background-color: #e94560;
+        color: white;
+        margin-top: 20px; /* Add space above the button in the game section */
+        margin-bottom: 20px; /* Space below the button */
+        width: auto; /* Allow button to size based on content */
+        align-self: center; /* Center the button if game-section is flex */
+    }
+
+    #back-to-home:hover {
+         background-color: #c2374f;
+        transform: translateY(-2px);
+    }
+
+
+    /* Media query for smaller screens */
+    @media (max-width: 768px) {
+        body {
+            padding: 15px;
+        }
+
+        /* Adjust padding for Auth and Home sections */
+        #auth-section, #home-section {
+            padding: 30px 20px;
+        }
+
+         /* --- NEW: Search Bar Styling for Mobile --- */
+         #search-container {
+             flex-direction: column; /* Stack input and button */
+             gap: 10px;
+         }
+         #search-input, #search-button {
+             width: 100%; /* Make them full width when stacked */
+             box-sizing: border-box; /* Include padding/border in width */
+         }
+         /* --- END NEW: Search Bar Styling for Mobile --- */
+
+
+        /* *** START: CHANGES FOR LARGER GAME AREA ON MOBILE *** */
+        #game-section {
+             /* Reduce horizontal padding significantly */
+             /* Also reduce top/bottom padding to give more vertical space to the game container */
+             padding: 5px; /* Reduced all-around padding to 5px */
+        }
+
+        #game-container {
+            /* Reduce top/bottom margins to make the container fill more vertical space */
+            margin-top: 5px; /* Reduced margin-top */
+            margin-bottom: 5px; /* Reduced margin-bottom */
+            /* padding-bottom (aspect ratio) and width are already responsive,
+               and will naturally increase as the parent #game-section padding is reduced. */
+        }
+        /* *** END: CHANGES FOR LARGER GAME AREA ON MOBILE *** */
+
+
+        h2 {
+            font-size: 1.8em;
+        }
+
+        h3 {
+            font-size: 1.3em;
+        }
+
+        input[type="email"],
+        input[type="password"],
+        input[type="text"],
+        button {
+            font-size: 0.95em;
+            padding: 10px 15px;
+        }
+
+        .secondary-button {
+            font-size: 0.95em;
+        }
+
+        #game-list {
+             grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Smaller min size for games */
+             gap: 15px;
+        }
+
+        .game-item h3 {
+            font-size: 1em;
+        }
+
+        .game-item .play-button {
+             font-size: 0.85em;
+             padding: 8px 10px;
+        }
+
+        /* Adjust margin for back button on mobile */
+        #back-to-home {
+             margin-top: 10px; /* Adjusted margin-top */
+             margin-bottom: 10px; /* Adjusted margin-bottom */
+        }
+    }
+</style>
+
+<!-- Firebase SDK Initialization and User Panel Logic -->
+<script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-analytics.js";
+    // Import Authentication and Firestore (or Realtime Database)
+    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
+    import { getFirestore, collection, getDocs, doc, getDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js";
+    // If using Realtime Database, uncomment below and adjust DB functions
+    // import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js";
+
+
+    // Your web app's Firebase configuration (Updated to your provided config)
+    const firebaseConfig = {
+        apiKey: "AIzaSyDn3w9ruBoM8fj1xPZWe06RU34fNU_QTvQ",
+        authDomain: "pakistanvsindiama.firebaseapp.com",
+        projectId: "pakistanvsindiama",
+        storageBucket: "pakistanvsindiama.firebasestorage.app",
+        messagingSenderId: "1092908411292",
+        appId: "1:1092908411292:web:ed74ca3b2162f4b55ec059",
+        measurementId: "G-2YKGPMJWEJ"
+        // Optional: Add databaseURL if using Realtime Database
+        // databaseURL: "YOUR_DATABASE_URL"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app); // Analytics initialized but not used in logic below
+
+    // Get Firebase service instances
+    const auth = getAuth(app);
+    const db = getFirestore(app); // Or getDatabase(app) for RTDB
+    const gamesCollection = collection(db, 'games'); // Reference to your games collection in Firestore
+
+
+    // --- Get References to HTML Elements ---
+    const authSection = document.getElementById('auth-section');
+    const homeSection = document.getElementById('home-section');
+    const gameSection = document.getElementById('game-section');
+
+    // Auth Elements
+    const signinForm = document.getElementById('signin-form');
+    const signupForm = document.getElementById('signup-form');
+    const signinEmailInput = document.getElementById('signin-email');
+    const signinPasswordInput = document.getElementById('signin-password');
+    const signinButton = document.getElementById('signin-button');
+    const showSignupButton = document.getElementById('show-signup');
+    const signinError = document.getElementById('signin-error');
+
+    const signupFullnameInput = document.getElementById('signup-fullname');
+    const signupEmailInput = document.getElementById('signup-email');
+    const signupPasswordInput = document.getElementById('signup-password');
+    const signupButton = document.getElementById('signup-button');
+    const showSigninButton = document.getElementById('show-signin');
+    const signupError = document.getElementById('signup-error');
+
+    // Home Elements
+    const gameListContainer = document.getElementById('game-list');
+    const signoutButton = document.getElementById('signout-button');
+
+    // --- NEW: Search Elements ---
+    const searchInput = document.getElementById('search-input');
+    const searchButton = document.getElementById('search-button');
+    // --- END NEW ---
+
+    // Game Elements
+    const gameTitleElement = document.getElementById('game-title');
+    const gameIframe = document.getElementById('game-iframe');
+    const backToHomeButton = document.getElementById('back-to-home');
+
+    // --- NEW: Variable to hold all fetched games ---
+    let allGames = [];
+    // --- END NEW ---
+
+
+    // --- Functions to switch UI views ---
+    function showAuthSection() {
+        authSection.style.display = 'flex'; // Use flex as per CSS
+        homeSection.style.display = 'none';
+        gameSection.style.display = 'none';
+    }
+
+    function showHomeSection() {
+        authSection.style.display = 'none';
+        homeSection.style.display = 'flex'; // Use flex as per CSS
+        gameSection.style.display = 'none';
+        // Call function to load games when home section is shown
+        // Note: This will always re-load from DB and reset search.
+        // If you want to preserve search results, you'd need more complex state management.
+        loadGames();
+    }
+
+    function showGameSection(gameName, gameHtml) {
+        authSection.style.display = 'none';
+        homeSection.style.display = 'none';
+        gameSection.style.display = 'flex'; // Use flex as per CSS
+        gameTitleElement.textContent = gameName;
+
+        // Load the HTML into the iframe
+        gameIframe.srcdoc = gameHtml;
+    }
+
+
+    // --- Authentication Logic ---
+
+    // Listen for auth state changes (handles page load and login/logout events)
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            // User is signed in.
+            console.log('User is signed in:', user);
+            showHomeSection();
+            // Optionally, save user data (like full name) to Firestore if needed later
+            // This would involve another Firestore call after createUserWithEmailAndPassword
+        } else {
+            // User is signed out.
+            console.log('User is signed out.');
+            showAuthSection();
+            // Ensure signin form is visible by default
+            signinForm.style.display = 'flex'; // Use flex as per CSS
+            signupForm.style.display = 'none';
+        }
+    });
+
+    // Event Listeners for Auth Forms
+    showSignupButton.addEventListener('click', () => {
+        signinForm.style.display = 'none';
+        signupForm.style.display = 'flex'; // Use flex as per CSS
+        signinError.textContent = ''; // Clear previous errors
+    });
+
+    showSigninButton.addEventListener('click', () => {
+        signupForm.style.display = 'none';
+        signinForm.style.display = 'flex'; // Use flex as per CSS
+        signupError.textContent = ''; // Clear previous errors
+    });
+
+    signinButton.addEventListener('click', async () => {
+        const email = signinEmailInput.value;
+        const password = signinPasswordInput.value;
+
+        signinError.textContent = ''; // Clear previous error
+
+        try {
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            // Signed in successfully. onAuthStateChanged will handle redirection.
+            console.log('Signed in:', userCredential.user);
+             // Clear inputs on success
+            signinEmailInput.value = '';
+            signinPasswordInput.value = '';
+        } catch (error) {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            console.error('Sign in error:', errorCode, errorMessage);
+            signinError.textContent = `Sign In Failed: ${errorMessage}`; // Display error to user
+        }
+    });
+
+    signupButton.addEventListener('click', async () => {
+        const fullName = signupFullnameInput.value.trim(); // Get full name
+        const email = signupEmailInput.value;
+        const password = signupPasswordInput.value;
+
+         signupError.textContent = ''; // Clear previous error
+
+        if (!fullName || !email || !password) {
+            signupError.textContent = 'Please fill in all fields.';
+            return;
+        }
+
+
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+            console.log('Signed up:', user);
+
+            // Optional: Save the full name associated with the user UID in Firestore/RTDB
+            // You would create a 'users' collection for this.
+            // await setDoc(doc(db, 'users', user.uid), {
+            //     fullName: fullName,
+            //     email: email, // Good practice to save, but email is already in Auth
+            //     createdAt: serverTimestamp()
+            // });
+            // console.log('User profile saved:', user.uid);
+
+
+            // Signed up successfully. onAuthStateChanged will handle redirection.
+             // Clear inputs on success
+             signupFullnameInput.value = '';
+             signupEmailInput.value = '';
+             signupPasswordInput.value = '';
+
+        } catch (error) {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+             console.error('Sign up error:', errorCode, errorMessage);
+            signupError.textContent = `Sign Up Failed: ${errorMessage}`; // Display error to user
+        }
+    });
+
+    signoutButton.addEventListener('click', async () => {
+        try {
+            await signOut(auth);
+            // Sign-out successful. onAuthStateChanged will handle redirection.
+            console.log('User signed out.');
+            // Clear input fields on signout for security
+            signinEmailInput.value = '';
+            signinPasswordInput.value = '';
+            signupFullnameInput.value = '';
+            signupEmailInput.value = '';
+            signupPasswordInput.value = '';
+             signinError.textContent = '';
+             signupError.textContent = '';
+             // Clear games data on signout
+             allGames = [];
+             gameListContainer.innerHTML = '';
+        } catch (error) {
+            console.error('Sign out error:', error);
+            // Handle error
+        }
+    });
+
+    // --- Game Listing and Search Logic ---
+
+    async function loadGames() {
+        gameListContainer.innerHTML = '<p>Loading games...</p>';
+
+        try {
+            // Fetch games from Firestore (or Realtime Database)
+             const gamesQuery = query(gamesCollection, orderBy('createdAt', 'desc')); // Assuming 'createdAt' field exists
+            const querySnapshot = await getDocs(gamesQuery);
+
+            allGames = []; // Clear previous data before loading new
+
+            if (querySnapshot.empty) {
+                gameListContainer.innerHTML = '<p>No games available yet.</p>';
+                // allGames will remain empty
+            } else {
+                querySnapshot.forEach((doc) => {
+                    const gameData = doc.data();
+                    // Store the relevant data in the allGames array
+                    allGames.push({
+                        id: doc.id,
+                        name: gameData.name || 'Unnamed Game',
+                        imageUrl: gameData.imageUrl || 'https://via.placeholder.com/150?text=No+Image',
+                        // We don't store htmlCode here to keep `allGames` lighter.
+                        // We'll fetch htmlCode specifically when a game is clicked to play.
+                    });
+                });
+                // --- NEW: Render all games initially after loading ---
+                renderGames(allGames);
+                // --- END NEW ---
+            }
+
+        } catch (error) {
+            console.error("Error fetching games: ", error);
+            gameListContainer.innerHTML = '<p style="color: red;">Error loading games.</p>';
+             allGames = []; // Ensure it's empty on error
+        }
+    }
+
+    // --- NEW: Function to render games from an array ---
+    function renderGames(gamesToRender) {
+        gameListContainer.innerHTML = ''; // Clear current list
+
+        if (gamesToRender.length === 0) {
+             gameListContainer.innerHTML = '<p>No games found matching your search.</p>'; // Message for no results
+             return;
+        }
+
+        gamesToRender.forEach(game => {
+            const gameElement = document.createElement('div');
+            gameElement.classList.add('game-item'); // Add a class for styling
+
+            gameElement.innerHTML = `
+                <img src="${game.imageUrl}" alt="${game.name}">
+                <h3>${game.name}</h3>
+                <button class="play-button" data-game-id="${game.id}">Play</button>
+            `;
+
+            gameListContainer.appendChild(gameElement);
+        });
+
+        // Add event listeners to "Play" buttons AFTER they are added to the DOM
+        document.querySelectorAll('.game-item .play-button').forEach(button => {
+            button.addEventListener('click', (event) => {
+                const gameIdToPlay = event.target.dataset.gameId;
+                console.log('Play button clicked for game ID:', gameIdToPlay);
+                loadSelectedGame(gameIdToPlay); // This function remains the same, it fetches the HTML
+            });
+        });
+    }
+    // --- END NEW ---
+
+
+    // Function to load the selected game HTML (This function remains mostly the same)
+    async function loadSelectedGame(gameId) {
+        // Fetch the specific game details using its ID
+        try {
+            const docSnap = await getDoc(doc(db, 'games', gameId));
+
+            if (docSnap.exists()) {
+                const gameData = docSnap.data();
+                console.log('Loading game:', gameData.name);
+                // Pass game name and HTML content to showGameSection
+                showGameSection(gameData.name || 'Game', gameData.htmlCode || '<p>Error loading game content.</p>'); // Add fallback
+            } else {
+                console.error("No such game document!");
+                alert("Game not found.");
+                showHomeSection(); // Go back home if game not found
+            }
+        } catch (error) {
+            console.error("Error fetching game details: ", error);
+            alert("Error loading game.");
+            showHomeSection(); // Go back home on error
+        }
+    }
+
+    // --- NEW: Search Functionality ---
+    function performSearch() {
+        const query = searchInput.value.trim().toLowerCase();
+
+        if (query === '') {
+            // If search bar is empty, show all games
+            renderGames(allGames);
+        } else {
+            // Filter the stored games based on the search query
+            const filteredGames = allGames.filter(game =>
+                game.name.toLowerCase().includes(query)
+            );
+            renderGames(filteredGames); // Render the filtered list
+        }
+    }
+
+    // Event listener for the search button click
+    searchButton.addEventListener('click', performSearch);
+
+    // Optional: Allow search on Enter key press in the input field
+    searchInput.addEventListener('keypress', (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault(); // Prevent potential form submission
+            performSearch();
+        }
+    });
+    // --- END NEW ---
+
+
+    // --- Game Play Section Logic ---
+
+    backToHomeButton.addEventListener('click', () => {
+        // Stop or reset the game in the iframe if necessary (more advanced)
+         gameIframe.srcdoc = ''; // Clear iframe content
+         gameIframe.src = 'about:blank'; // Load blank page to ensure full reset
+
+        showHomeSection(); // Go back to the home list (which re-loads all games by default)
+    });
+
+    // --- Initial Load ---
+    // The onAuthStateChanged listener handles the initial view based on login status.
+    // It will call showAuthSection or showHomeSection appropriately on page load.
+
+</script>
+
+</head>
+<body>
+    <!-- Adsterra Script at the TOP (after opening body tag) -->
+    <script type="text/javascript">
+        atOptions = {
+            'key' : '3d43a842c228553bbce99198dae1a603',
+            'format' : 'iframe',
+            'height' : 50,
+            'width' : 320,
+            'params' : {}
+        };
+    </script>
+    <script type="text/javascript" src="//www.highperformanceformat.com/3d43a842c228553bbce99198dae1a603/invoke.js"></script>
+    <!-- End Adsterra Script at the TOP -->
+
+<div id="auth-section">
+    <h2>Welcome to the Learning App  Store</h2>
+
+    <div id="signin-form">
+        <h3>Sign In</h3>
+        <input type="email" id="signin-email" placeholder="Email">
+        <input type="password" id="signin-password" placeholder="Password">
+        <button id="signin-button">Sign In</button>
+        <p id="signin-error"></p>
+        <p>Don't have an account? <button id="show-signup" class="secondary-button">Sign Up</button></p>
+    </div>
+
+    <div id="signup-form" style="display: none;">
+        <h3>Sign Up</h3>
+        <input type="text" id="signup-fullname" placeholder="Full Name">
+        <input type="email" id="signup-email" placeholder="Email">
+        <input type="password" id="signup-password" placeholder="Password">
+        <button id="signup-button">Sign Up</button>
+        <p id="signup-error"></p>
+        <p>Already have an account? <button id="show-signin" class="secondary-button">Sign In</button></p>
+    </div>
+</div>
+
+<div id="home-section" style="display: none;">
+    <h2>Available </h2>
+
+    <!-- --- NEW: Search Bar HTML --- -->
+    <div id="search-container">
+        <input type="text" id="search-input" placeholder="Search games...">
+        <button id="search-button">Search</button>
+    </div>
+    <!-- --- END NEW --- -->
+
+    <div id="game-list">
+        <!-- Game list will be populated here by JavaScript -->
+        <p>Loading games...</p>
+    </div>
+    <button id="signout-button">Sign Out</button>
+</div>
+
+<div id="game-section" style="display: none;">
+    <h2 id="game-title"></h2>
+     <button id="back-to-home">Back to Home</button> <!-- Moved button above game container -->
+    <div id="game-container">
+        <!-- The HTML game will be loaded here -->
+        <iframe id="game-iframe"></iframe>
+    </div>
+</div>
+
+<!-- Adsterra Script at the BOTTOM (before closing body tag) -->
+<script type="text/javascript">
+    atOptions = {
+        'key' : '3d43a842c228553bbce99198dae1a603',
+        'format' : 'iframe',
+        'height' : 50,
+        'width' : 320,
+        'params' : {}
+    };
+</script>
+<script type="text/javascript" src="//www.highperformanceformat.com/3d43a842c228553bbce99198dae1a603/invoke.js"></script>
+<!-- End Adsterra Script at the BOTTOM -->
+</body>
+</html>
